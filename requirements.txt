@@ -1,0 +1,9 @@
+# All Python libraries this project needs
+# Install with: pip3 install -r requirements.txt
+
+pandas==2.3.3
+snowflake-connector-python==3.18.0
+boto3==1.42.69
+python-dotenv==1.0.0
+apache-airflow==2.8.0
+dbt-snowflake==1.7.0

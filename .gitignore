@@ -1,0 +1,16 @@
+# Credentials — NEVER commit these
+.env
+
+# dbt generated files
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Python
+__pycache__/
+*.pyc
+.DS_Store
+
+# Logs
+logs/
+*.log
