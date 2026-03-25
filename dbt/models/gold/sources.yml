@@ -1,0 +1,55 @@
+version: 2
+
+# Gold models use ref() not source()
+# because they read from silver models
+# This file documents the gold models
+
+models:
+  - name: dim_customers
+    description: "Customer dimension — joins CRM customer info, demographics and location"
+    columns:
+      - name: customer_key
+        description: "Surrogate key — MD5 of customer number"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+      - name: country
+        tests:
+          - not_null
+
+  - name: dim_products
+    description: "Product dimension — joins product info with categories. Active products only."
+    columns:
+      - name: product_key
+        description: "Surrogate key — MD5 of product number"
+        tests:
+          - unique
+          - not_null
+      - name: product_id
+        tests:
+          - not_null
+
+  - name: dim_date
+    description: "Date dimension — built from sales order dates"
+    columns:
+      - name: date_key
+        description: "Surrogate key — date as YYYYMMDD integer"
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_sales
+    description: "Sales fact table — one row per order line"
+    columns:
+      - name: order_number
+        tests:
+          - not_null
+      - name: sales_amount
+        tests:
+          - not_null
+      - name: quantity
+        tests:
+          - not_null

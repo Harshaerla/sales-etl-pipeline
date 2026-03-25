@@ -1,0 +1,77 @@
+# This workflow runs automatically every time
+# you push code to the main branch
+# It runs dbt tests first — if they pass, runs dbt run
+
+name: dbt CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  dbt:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1 — checkout your code from GitHub
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2 — install Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Step 3 — install dbt
+      - name: Install dbt
+        run: pip install dbt-snowflake==1.7.0
+
+      # Step 4 — create profiles.yml from GitHub secrets
+      # Secrets are stored in GitHub repo settings
+      # Never hardcoded in code
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat <<EOF > ~/.dbt/profiles.yml
+          sales_etl_pipeline:
+            target: dev
+            outputs:
+              dev:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+                role: ACCOUNTADMIN
+                warehouse: COMPUTE_WH
+                database: ecommerce_dw
+                schema: silver
+                threads: 4
+          EOF
+
+      # Step 5 — run dbt tests first
+      # If any test fails — pipeline stops here
+      - name: Run dbt tests
+        working-directory: ./dbt
+        run: dbt test
+
+      # Step 6 — only if tests pass — run dbt
+      - name: Run dbt models
+        working-directory: ./dbt
+        run: dbt run
+
+---
+
+# STEP 9 — Add GitHub Secrets
+
+# Go to your GitHub repo
+# → Settings
+# → Secrets and variables
+# → Actions
+# → New repository secret
+
+# Add these 3 secrets:
+# SNOWFLAKE_ACCOUNT  →  AKIHSLK-GF60409
+# SNOWFLAKE_USER     →  HARSHAKUMAR
+# SNOWFLAKE_PASSWORD →  your_password 
